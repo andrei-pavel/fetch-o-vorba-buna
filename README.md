@@ -14,9 +14,9 @@ Version 0.1 alpha
 ## Dependencies
 
 Install them yourself:
-- [curl](https://curl.haxx.se/) - retrieve data from servers
+- [curl](https://curl.haxx.se) - retrieve data from servers
 - [pup](https://github.com/ericchiang/pup) - HTML parser
-- [wget](https://github.com/mitsuhiko/unp) - retrieve data from web servers
+- [wget](https://www.gnu.org/software/wget) - retrieve data from web servers
 
 
 ## Support the maintainer
