@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Copyright (C) 2017-2018 Andrei Pavel, andrei.pavel@cti.pub.ro
+# Licensed under the MIT License
+
+# Get script path and append it to PATH so other scripts are callable.
+SCRIPT_PATH="$(dirname "$(readlink -f "${0}")")"
+PATH="${PATH}:${SCRIPT_PATH}"
+
+# Header
+ARGUMENTS="\
+\$mp3_index                    index of the mp3 audio files to start retrieving from
+"
+. "${SCRIPT_PATH}/lib/header"
+. "${SCRIPT_PATH}/lib/spinner"
+
+# Parse arguments.
+while (( ${#} > 0 )); do
+  case "${1}" in
+  *)
+    # \$mp3_index                    index of the mp3 audio files to start retrieving from
+    [[ -z ${mp3_index} ]] && mp3_index=${1} && shift && continue
+    # Unrecognized argument
+    printf "${RED}ERROR: Unrecognized argument '%s'${RESET}\\n" "${1}" 1>&2; printUsage; exit 1 ;;
+  esac; shift
+done
+
+#------------------------------------------------------------------------------#
+
+directory='/usr/share/o-vorba-buna'
+
+if [[ ! -e "${directory}" ]]; then
+  mkdir -p "${directory}"
+fi
+
+editions=$(curl -s http://www.romania-actualitati.ro/Podcast/o_vorba_buna/14 | pup 'div.podcastilisting a text{}')
+urls=$(curl -s http://www.romania-actualitati.ro/Podcast/o_vorba_buna/14 | pup 'div.podcastilisting a attr{href}' | grep -v '#')
+
+SAVEIFS=$IFS
+IFS=$'\n'
+
+editions=( ${editions} )
+
+urls=( ${urls} )
+
+IFS=$SAVEIFS
+
+i=0
+while [[ "${urls[${i}]}" != '' ]]; do
+  start_spinner "${editions[${i}]}"
+  if wget -O "${directory}/0.mp3" "${urls[${i}]}" &> /dev/null; then
+    destination="${directory}/$(printf '%s' "${editions[${i}]}" | xargs).mp3"
+    mv "${directory}/0.mp3" "${destination}"
+  fi
+  (( ++i ))
+  stop_spinner 0
+done
