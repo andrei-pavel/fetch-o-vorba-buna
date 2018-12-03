@@ -5,10 +5,10 @@
 #
 # Warning! Nested spinners are not supported.
 
-. "$(dirname "${BASH_SOURCE[0]}")/traps"
+[[ ! -z ${_LIB_SPINNER_INCLUDED+x} ]] && return 0
+_LIB_SPINNER_INCLUDED=true
 
-SUCCESS='DONE'
-FAIL='FAIL'
+. "$(dirname "${BASH_SOURCE[0]}")/traps"
 
 _spinner_cycle=(
 '[●   ]'
@@ -31,8 +31,12 @@ else
 fi
 
 function _display_message() {
-  local mode=${1}
-  local status=${2}
+  local mode=
+  local status=
+  while (( ${#} > 0 )); do
+    [[ -z ${mode} ]] && mode=${1} && shift && continue
+    [[ -z ${status} ]] && status=${1} && shift && continue
+  done
   if [[ ${mode} = 'spinning' ]]; then
     status="${_spinner_cycle[$((_i%${#_spinner_cycle[@]}))]}"
     (( ++_i ))
@@ -56,14 +60,12 @@ function _spinner {
 
     stop)
       _tput cvvis
-      if [[ -z ${_spinner_pid} ]]; then
-        return 1
-      fi
+      [[ -z ${_spinner_pid+x} ]] && return 1
       kill "${_spinner_pid}" > /dev/null 2>&1
       if [[ ${2} = 0 ]]; then
-        status="${GREEN}${SUCCESS}${RESET}"
+        status="${GREEN}DONE${RESET}"
       else
-        status="${GREEN}${FAIL}${RESET}"
+        status="${GREEN}FAIL${RESET}"
       fi
       _display_message 'status' "[${status}]"
       ;;
@@ -76,7 +78,7 @@ function _spinner {
 }
 
 function start_spinner() {
-  if [[ ${-} = *x* || ! -z ${_spinner_pid} ]]; then
+  if [[ ${-} = *x* || ! -z ${_spinner_pid+x} ]]; then
     return
   fi
   _message="${1}"
@@ -89,7 +91,7 @@ function start_spinner() {
 }
 
 function stop_spinner() {
-  if [[ ${-} = *x* || -z ${_spinner_pid} ]]; then
+  if [[ ${-} = *x* || -z ${_spinner_pid+x} ]]; then
     return
   fi
   exec 1>&3
