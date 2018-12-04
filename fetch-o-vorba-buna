@@ -3,14 +3,11 @@
 # Copyright (C) 2017-2018 Andrei Pavel, andrei.pavel@cti.pub.ro
 # Licensed under the MIT License
 
-# Get script path and append it to PATH so other scripts are callable.
-SCRIPT_PATH="$(dirname "$(readlink -f "${0}")")"
-PATH="${PATH}:${SCRIPT_PATH}"
-
 # Header
 ARGUMENTS="\
 \$mp3_index                    index of the mp3 audio files to start retrieving from
 "
+SCRIPT_PATH="$(dirname "$(readlink -f "${0}")")"
 . "${SCRIPT_PATH}/lib/header"
 . "${SCRIPT_PATH}/lib/spinner"
 
