@@ -18,7 +18,7 @@ while (( ${#} > 0 )); do
     # \$mp3_index                    index of the mp3 audio files to start retrieving from
     [[ -z ${mp3_index} ]] && mp3_index=${1} && shift && continue
     # Unrecognized argument
-    printf "${RED}ERROR: Unrecognized argument '%s'${RESET}\\n" "${1}" 1>&2; printUsage; exit 1 ;;
+    printf "${RED}ERROR: Unrecognized argument '%s'${RESET}\\n" "${1}" 1>&2; print-usage; exit 1 ;;
   esac; shift
 done
 
@@ -44,11 +44,11 @@ IFS=$SAVEIFS
 
 i=0
 while [[ "${urls[${i}]}" != '' ]]; do
-  start_spinner "${editions[${i}]}"
+  start-spinner "${editions[${i}]}"
   if wget -O "${directory}/0.mp3" "${urls[${i}]}" &> /dev/null; then
     destination="${directory}/$(printf '%s' "${editions[${i}]}" | xargs).mp3"
     mv "${directory}/0.mp3" "${destination}"
   fi
   (( ++i ))
-  stop_spinner 0
+  stop-spinner 0
 done
