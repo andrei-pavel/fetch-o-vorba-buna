@@ -16,7 +16,7 @@ while (( ${#} > 0 )); do
   case "${1}" in
   *)
     # \$mp3_index                    index of the mp3 audio files to start retrieving from
-    [[ -z ${mp3_index} ]] && mp3_index=${1} && shift && continue
+    [[ -z "${mp3_index+x}" ]] && mp3_index=${1} && shift && continue
     # Unrecognized argument
     printf "${RED}ERROR: Unrecognized argument '%s'${RESET}\\n" "${1}" 1>&2; print-usage; exit 1 ;;
   esac; shift
@@ -33,14 +33,14 @@ fi
 editions=$(curl -s http://www.romania-actualitati.ro/Podcast/o_vorba_buna/14 | pup 'div.podcastilisting a text{}')
 urls=$(curl -s http://www.romania-actualitati.ro/Podcast/o_vorba_buna/14 | pup 'div.podcastilisting a attr{href}' | grep -v '#')
 
-SAVEIFS=$IFS
+SAVEIFS="${IFS}"
 IFS=$'\n'
 
 editions=( ${editions} )
 
 urls=( ${urls} )
 
-IFS=$SAVEIFS
+IFS="${SAVEIFS}"
 
 i=0
 while [[ "${urls[${i}]}" != '' ]]; do
