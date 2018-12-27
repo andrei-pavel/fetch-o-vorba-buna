@@ -44,9 +44,13 @@ IFS="${SAVEIFS}"
 
 i=0
 while [[ "${urls[${i}]}" != '' ]]; do
+  month="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 4)"
+  year="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 5)"
   start-spinner "${editions[${i}]}"
   if wget -O "${directory}/0.mp3" "${urls[${i}]}" &> /dev/null; then
-    destination="${directory}/$(printf '%s' "${editions[${i}]}" | xargs).mp3"
+    month_directory="${directory}/${year}/${month}"
+    mkdir -p "${month_directory}"
+    destination="${month_directory}/$(printf '%s' "${editions[${i}]}" | xargs).mp3"
     mv "${directory}/0.mp3" "${destination}"
   fi
   (( ++i ))
