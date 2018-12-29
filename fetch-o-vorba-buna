@@ -42,17 +42,28 @@ urls=( ${urls} )
 
 IFS="${SAVEIFS}"
 
+months=
 i=0
-while [[ "${urls[${i}]}" != '' ]]; do
+while (( i < ${#urls[@]} )); do
   month="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 4)"
   year="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 5)"
   start-spinner "${editions[${i}]}"
   if wget -O "${directory}/0.mp3" "${urls[${i}]}" &> /dev/null; then
     month_directory="${directory}/${year}/${month}"
     mkdir -p "${month_directory}"
-    destination="${month_directory}/$(printf '%s' "${editions[${i}]}" | xargs).mp3"
-    mv "${directory}/0.mp3" "${destination}"
+    filename="$(printf '%s' "${editions[${i}]}" | xargs).mp3"
+    cp "${directory}/0.mp3" "${directory}/${filename}"
+    mv "${directory}/0.mp3" "${month_directory}/${filename}"
+  fi
+  if ! [[ "${months}" = *"${month}"* ]]; then
+    months="${months} ${month}"
   fi
   (( ++i ))
   stop-spinner 0
 done
+
+arguments=()
+for month in ${months}; do
+  arguments+=( -not -name "*${month}*" )
+done
+find "${directory}" -maxdepth 1 -type f ${arguments[@]} -delete
