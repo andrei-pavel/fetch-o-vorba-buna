@@ -52,8 +52,9 @@ while (( i >= 0 )); do
     month_directory="${directory}/${year}/${month}"
     mkdir -p "${month_directory}"
     filename="$(printf '%s' "${editions[${i}]}" | xargs).mp3"
-    cp "${directory}/0.mp3" "${directory}/${filename}"
-    mv "${directory}/0.mp3" "${month_directory}/${filename}"
+    cp -p "${directory}/0.mp3" "${directory}/${filename}"
+    cp -p "${directory}/0.mp3" "${month_directory}/${filename}"
+    rm "${directory}/0.mp3"
   fi
   if ! [[ "${months}" = *"${month}"* ]]; then
     months="${months} ${month}"
