@@ -43,8 +43,8 @@ urls=( ${urls} )
 IFS="${SAVEIFS}"
 
 months=
-i=0
-while (( i < ${#urls[@]} )); do
+i=$(( ${#urls[@]} - 1 ))
+while (( i >= 0 )); do
   month="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 4)"
   year="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 5)"
   start-spinner "${editions[${i}]}"
@@ -58,7 +58,7 @@ while (( i < ${#urls[@]} )); do
   if ! [[ "${months}" = *"${month}"* ]]; then
     months="${months} ${month}"
   fi
-  (( ++i ))
+  i=$(( i - 1 ))
   stop-spinner 0
 done
 
