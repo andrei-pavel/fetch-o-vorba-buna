@@ -54,8 +54,8 @@ while (( i >= 0 )); do
     filename="$(printf '%s' "${editions[${i}]}" | xargs).mp3"
     cp -p "${directory}/0.mp3" "${directory}/${filename}"
     cp -p "${directory}/0.mp3" "${month_directory}/${filename}"
-    rm "${directory}/0.mp3"
   fi
+  rm -f "${directory}/0.mp3"
   if ! [[ "${months}" = *"${month}"* ]]; then
     months="${months} ${month}"
   fi
