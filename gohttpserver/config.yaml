@@ -1,0 +1,7 @@
+---
+addr: ":8080"
+cors: true
+root: /usr/share/html
+title: ""
+theme: blue
+xheaders: true

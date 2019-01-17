@@ -26,7 +26,7 @@ done
 
 pushd "${SCRIPT_PATH}" > /dev/null
 {
-  for dependency in curl pup wget; do
+  for dependency in curl gohttpserver pup wget; do
     if ! command -v ${dependency} &> /dev/null; then
       printf 'Please install %s before continuing.\n' "${dependency}" >&2
       exit 1
@@ -35,10 +35,16 @@ pushd "${SCRIPT_PATH}" > /dev/null
 
   install './fetch-o-vorba-buna' "${pkgdir}/usr/local/bin"
   install './fetch-o-vorba-buna.service' "${pkgdir}/lib/systemd/system"
+  install './gohttpserver/gohttpserver.service' "${pkgdir}/lib/systemd/system"
   install -d './lib' "${pkgdir}/usr/local/bin/lib"
+  mkdir -p '/etc/fetch-o-vorba-buna/gohttpserver'
+  install './gohttpserver/config.yaml' '/etc/fetch-o-vorba-buna/gohttpserver'
+  cp -rf ./gohttpserver/* '/etc/fetch-o-vorba-buna/gohttpserver'
   install ./lib/* "${pkgdir}/usr/local/bin/lib"
   systemctl daemon-reload
   systemctl enable fetch-o-vorba-buna.service
   systemctl restart fetch-o-vorba-buna.service
+  systemctl enable gohttpserver.service
+  systemctl restart gohttpserver.service
 }
 popd 1> /dev/null
