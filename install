@@ -33,18 +33,34 @@ pushd "${SCRIPT_PATH}" > /dev/null
     fi
   done
 
+  mkdir -p '/etc/fetch-o-vorba-buna/gohttpserver'
+  mkdir -p '/lib/systemd/system'
+  mkdir -p '/usr/share/html'
+  mkdir -p '/usr/share/o-vorba-buna'
+
   install './fetch-o-vorba-buna' "${pkgdir}/usr/local/bin"
   install './fetch-o-vorba-buna.service' "${pkgdir}/lib/systemd/system"
   install './gohttpserver/gohttpserver.service' "${pkgdir}/lib/systemd/system"
-  if [[ ! -e '/usr/share/html/o-vorba-buna' ]]; then ln -s '/usr/share/o-vorba-buna' '/usr/share/html/o-vorba-buna'; fi
+  if [[ ! -e '/usr/share/html/o-vorba-buna' ]]; then
+    ln -s '/usr/share/o-vorba-buna' '/usr/share/html/o-vorba-buna'
+  fi
   install -d './lib' "${pkgdir}/usr/local/bin/lib"
-  mkdir -p '/etc/fetch-o-vorba-buna/gohttpserver'
   cp -rf ./gohttpserver/* '/etc/fetch-o-vorba-buna/gohttpserver'
   install ./lib/* "${pkgdir}/usr/local/bin/lib"
-  systemctl daemon-reload
-  systemctl enable fetch-o-vorba-buna.service
-  systemctl restart fetch-o-vorba-buna.service
-  systemctl enable gohttpserver.service
-  systemctl restart gohttpserver.service
+
+  if command -v systemctl &> /dev/null; then
+    systemctl daemon-reload
+    systemctl enable fetch-o-vorba-buna
+    systemctl restart fetch-o-vorba-buna
+    systemctl enable gohttpserver
+    systemctl restart gohttpserver
+  elif command -v service &> /dev/null; then
+    service fetch-o-vorba-buna enable
+    service fetch-o-vorba-buna restart
+    service gohttpserver enable
+    service gohttpserver restart
+  else
+    printf 'Service not installed because neither systemd nor SysV-Init is not installed.' &> 2
+  fi
 }
 popd 1> /dev/null
