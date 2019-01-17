@@ -36,9 +36,9 @@ pushd "${SCRIPT_PATH}" > /dev/null
   install './fetch-o-vorba-buna' "${pkgdir}/usr/local/bin"
   install './fetch-o-vorba-buna.service' "${pkgdir}/lib/systemd/system"
   install './gohttpserver/gohttpserver.service' "${pkgdir}/lib/systemd/system"
+  if [[ ! -e '/usr/share/html/o-vorba-buna' ]]; then ln -s '/usr/share/o-vorba-buna' '/usr/share/html/o-vorba-buna'; fi
   install -d './lib' "${pkgdir}/usr/local/bin/lib"
   mkdir -p '/etc/fetch-o-vorba-buna/gohttpserver'
-  install './gohttpserver/config.yaml' '/etc/fetch-o-vorba-buna/gohttpserver'
   cp -rf ./gohttpserver/* '/etc/fetch-o-vorba-buna/gohttpserver'
   install ./lib/* "${pkgdir}/usr/local/bin/lib"
   systemctl daemon-reload
