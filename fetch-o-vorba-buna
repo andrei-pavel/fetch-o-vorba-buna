@@ -43,17 +43,17 @@ urls=( ${urls} )
 
 IFS="${SAVEIFS}"
 
-declare -a filenames
-filenames=()
+spared_files=
 i=$(( ${#urls[@]} - 1 ))
 while (( i >= 0 )); do
   start-spinner "${editions[${i}]}"
   if wget -O "${auxiliary}" "${urls[${i}]}" &> /dev/null; then
     filename="$(printf '%s' "${editions[${i}]}" | xargs).mp3"
+    spared_files+="-not -name \"${filename}\" "
     filenames=( ${filenames[@]} "${filename}" )
     month="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 4)"
-    month_directory="${directory}/${year}/${month}"
     year="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 5)"
+    month_directory="${directory}/${year}/${month}"
     mkdir -p "${month_directory}"
     cp -p "${auxiliary}" "${directory}/${filename}"
     cp -p "${auxiliary}" "${month_directory}/${filename}"
@@ -62,12 +62,6 @@ while (( i >= 0 )); do
   stop-spinner 0
 done
 
-echo ${#filenames[@]}
-
-arguments=()
-for i in $(seq 1 ${#filenames[@]}); do
-  arguments+=( -not -name "${filenames[i]}" )
-done
-find "${directory}" -maxdepth 1 -type f ${arguments[@]} -delete
+eval find "${directory}" -maxdepth 1 -type f ${spared_files} -delete
 
 rm -f "${auxiliary}"
