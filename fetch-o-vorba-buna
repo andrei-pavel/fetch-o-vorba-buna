@@ -25,6 +25,7 @@ done
 #------------------------------------------------------------------------------#
 
 directory='/usr/share/o-vorba-buna'
+auxiliary="/tmp/o-vorba-buna.mp3"
 
 if [[ ! -e "${directory}" ]]; then
   mkdir -p "${directory}"
@@ -42,29 +43,31 @@ urls=( ${urls} )
 
 IFS="${SAVEIFS}"
 
-months=
+declare -a filenames
+filenames=()
 i=$(( ${#urls[@]} - 1 ))
 while (( i >= 0 )); do
-  month="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 4)"
-  year="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 5)"
   start-spinner "${editions[${i}]}"
-  if wget -O "${directory}/0.mp3" "${urls[${i}]}" &> /dev/null; then
-    month_directory="${directory}/${year}/${month}"
-    mkdir -p "${month_directory}"
+  if wget -O "${auxiliary}" "${urls[${i}]}" &> /dev/null; then
     filename="$(printf '%s' "${editions[${i}]}" | xargs).mp3"
-    cp -p "${directory}/0.mp3" "${directory}/${filename}"
-    cp -p "${directory}/0.mp3" "${month_directory}/${filename}"
-  fi
-  rm -f "${directory}/0.mp3"
-  if ! [[ "${months}" = *"${month}"* ]]; then
-    months="${months} ${month}"
+    filenames=( ${filenames[@]} "${filename}" )
+    month="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 4)"
+    month_directory="${directory}/${year}/${month}"
+    year="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 5)"
+    mkdir -p "${month_directory}"
+    cp -p "${auxiliary}" "${directory}/${filename}"
+    cp -p "${auxiliary}" "${month_directory}/${filename}"
   fi
   i=$(( i - 1 ))
   stop-spinner 0
 done
 
+echo ${#filenames[@]}
+
 arguments=()
-for month in ${months}; do
-  arguments+=( -not -name "*${month}*" )
+for i in $(seq 1 ${#filenames[@]}); do
+  arguments+=( -not -name "${filenames[i]}" )
 done
 find "${directory}" -maxdepth 1 -type f ${arguments[@]} -delete
+
+rm -f "${auxiliary}"
