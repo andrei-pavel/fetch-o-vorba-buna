@@ -42,7 +42,7 @@ function fetch() {
   local name="${1}"
   local url="${2}"
 
-  directory="/usr/share/${name}"
+  directory="/usr/share/radio-romania-actualitati-podcasts/${name}"
   auxiliary="/tmp/${name}.mp3"
 
   if [[ ! -e "${directory}" ]]; then

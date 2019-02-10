@@ -6,7 +6,7 @@ If used as service, it repeats every one hour.
 
 Run `./install` to install as a service, it usually requires root access.
 
-Episodes will be found in `/usr/share/${show}` e.g. `/usr/share/o-vorba-buna`.
+Episodes will be found in `/usr/share/radio-romania-actualitati-podcasts/${show}`.
 
 Version 1.0
 
