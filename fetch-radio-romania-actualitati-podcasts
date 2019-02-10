@@ -98,7 +98,7 @@ list=(
   'sitcom_undeva_in_28/33'
 )
 
-for item in ${list}; do
+for item in ${list[@]}; do
   name="$(cut -d '/' -f 1 <<< ${item})"
   name="${name//_/-}"
   fetch ${name} ${item}
