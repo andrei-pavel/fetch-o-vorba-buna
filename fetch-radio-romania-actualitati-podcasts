@@ -26,12 +26,11 @@ done
 
 function download() {
   filename="$(printf '%s' "${editions[${i}]}" | xargs).mp3"
+  spared_files+="-not -name \"${filename}\" "
   if [[ -f "${directory}/${filename}" ]]; then
     return
   fi
   if wget -O "${auxiliary}" "${urls[${i}]}" &> /dev/null; then
-    spared_files+="-not -name \"${filename}\" "
-    filenames=( ${filenames[@]} "${filename}" )
     month="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 4)"
     year="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 5)"
     month_directory="${directory}/${year}/${month}"
