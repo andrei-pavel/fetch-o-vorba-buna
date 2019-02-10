@@ -2,6 +2,6 @@
 addr: ":80"
 cors: true
 root: /usr/share/radio-romania-actualitati-podcasts
-title: ""
+title: "Radio România Actualități Podcasts"
 theme: blue
 xheaders: true
