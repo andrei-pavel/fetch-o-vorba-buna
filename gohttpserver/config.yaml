@@ -1,7 +1,7 @@
 ---
-addr: ":8080"
+addr: ":80"
 cors: true
-root: /usr/share/html
+root: /usr/share/radio-romania-actualitati-podcasts
 title: ""
 theme: blue
 xheaders: true
