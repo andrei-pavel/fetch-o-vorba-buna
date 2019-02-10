@@ -1,0 +1,105 @@
+#!/bin/bash
+
+# Copyright (C) 2017-2018 Andrei Pavel, andrei.pavel@cti.pub.ro
+# Licensed under the MIT License
+
+# Header
+ARGUMENTS="\
+\$mp3_index                    index of the mp3 audio files to start retrieving from
+"
+SCRIPT_PATH="$(dirname "$(readlink -f "${0}")")"
+. "${SCRIPT_PATH}/lib/header"
+. "${SCRIPT_PATH}/lib/spinner"
+
+# Parse arguments.
+while (( ${#} > 0 )); do
+  case "${1}" in
+  *)
+    # \$mp3_index                    index of the mp3 audio files to start retrieving from
+    [[ -z "${mp3_index+x}" ]] && mp3_index=${1} && shift && continue
+    # Unrecognized argument
+    printf "${RED}ERROR: Unrecognized argument '%s'${RESET}\\n" "${1}" 1>&2; print-usage; exit 1 ;;
+  esac; shift
+done
+
+#------------------------------------------------------------------------------#
+
+function download() {
+  if wget -O "${auxiliary}" "${urls[${i}]}" &> /dev/null; then
+    filename="$(printf '%s' "${editions[${i}]}" | xargs).mp3"
+    spared_files+="-not -name \"${filename}\" "
+    filenames=( ${filenames[@]} "${filename}" )
+    month="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 4)"
+    year="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 5)"
+    month_directory="${directory}/${year}/${month}"
+    mkdir -p "${month_directory}"
+    cp -p "${auxiliary}" "${directory}/${filename}"
+    cp -p "${auxiliary}" "${month_directory}/${filename}"
+  fi
+}
+
+function fetch() {
+  local name="${1}"
+  local url="${2}"
+
+  directory="/usr/share/${name}"
+  auxiliary="/tmp/${name}.mp3"
+
+  if [[ ! -e "${directory}" ]]; then
+    mkdir -p "${directory}"
+  fi
+
+  editions=$(curl -s "http://www.romania-actualitati.ro/Podcast/${url}" | pup 'div.podcastilisting a text{}')
+  urls=$(curl -s "http://www.romania-actualitati.ro/Podcast/${url}" | pup 'div.podcastilisting a attr{href}' | grep -v '#')
+
+  SAVEIFS="${IFS}"
+  IFS=$'\n'
+
+  editions=( ${editions} )
+
+  urls=( ${urls} )
+
+  IFS="${SAVEIFS}"
+
+  spared_files=
+  i=$(( ${#urls[@]} - 1 ))
+  while (( i >= 0 )); do
+    start-spinner "${name} - ${editions[${i}]}"
+    download
+    i=$(( i - 1 ))
+    stop-spinner 0
+  done
+
+  eval find "${directory}" -maxdepth 1 -type f ${spared_files} -delete
+
+  rm -f "${auxiliary}"
+}
+
+list=(
+  'agenda_globala/1'
+  'istorica/4'
+  'documentarele_radio_romania_actualitati/5'
+  'euroatlantica/8'
+  '150_de_cuvinte/12'
+  'lectia_de_gramatica/13'
+  'o_vorba_buna/14'
+  'buna_ziua_caciula_ca_stapanul_n_are_guracod_de_bune_maniere/15'
+  'povesti_cu_care_cresti/17'
+  'la_dispozitia_dumneavoastra_reteta_de_sanatate/18'
+  'un_minut_de_sanatate/20'
+  'semnele_lumii/21'
+  'probleme_la_zi/22'
+  'accente_europene/24'
+  'serviciul_de_noapte/25'
+  'printre_stele/26'
+  'colectia_de_muzica_omul_cu_chitara/27'
+  'teatru_national_radiofonic/29'
+  'antena_partidelor_parlamentare/30'
+  'sitcom_undeva_in_28/33'
+)
+
+for item in ${list}; do
+  name="$(cut -d '/' -f 1 <<< ${item})"
+  name="${name//_/-}"
+  fetch ${name} ${item}
+done

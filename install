@@ -33,30 +33,30 @@ pushd "${SCRIPT_PATH}" > /dev/null
     fi
   done
 
-  mkdir -p '/etc/fetch-o-vorba-buna/gohttpserver'
+  mkdir -p '/etc/fetch-radio-romania-actualitati-podcasts/gohttpserver'
   mkdir -p '/lib/systemd/system'
   mkdir -p '/usr/share/html'
-  mkdir -p '/usr/share/o-vorba-buna'
+  mkdir -p '/usr/share/radio-romania-actualitati-podcasts'
 
-  install './fetch-o-vorba-buna' "${pkgdir}/usr/local/bin"
-  install './fetch-o-vorba-buna.service' "${pkgdir}/lib/systemd/system"
+  install './fetch-radio-romania-actualitati-podcasts' "${pkgdir}/usr/local/bin"
+  install './fetch-radio-romania-actualitati-podcasts.service' "${pkgdir}/lib/systemd/system"
   install './gohttpserver/gohttpserver.service' "${pkgdir}/lib/systemd/system"
-  if [[ ! -e '/usr/share/html/o-vorba-buna' ]]; then
-    ln -s '/usr/share/o-vorba-buna' '/usr/share/html/o-vorba-buna'
+  if [[ ! -e '/usr/share/html/radio-romania-actualitati-podcasts' ]]; then
+    ln -s '/usr/share/radio-romania-actualitati-podcasts' '/usr/share/html/radio-romania-actualitati-podcasts'
   fi
   install -d './lib' "${pkgdir}/usr/local/bin/lib"
-  cp -rf ./gohttpserver/* '/etc/fetch-o-vorba-buna/gohttpserver'
+  cp -rf ./gohttpserver/* '/etc/fetch-radio-romania-actualitati-podcasts/gohttpserver'
   install ./lib/* "${pkgdir}/usr/local/bin/lib"
 
   if command -v systemctl &> /dev/null; then
     systemctl daemon-reload
-    systemctl enable fetch-o-vorba-buna
-    systemctl restart fetch-o-vorba-buna
+    systemctl enable fetch-radio-romania-actualitati-podcasts
+    systemctl restart fetch-radio-romania-actualitati-podcasts
     systemctl enable gohttpserver
     systemctl restart gohttpserver
   elif command -v service &> /dev/null; then
-    service fetch-o-vorba-buna enable
-    service fetch-o-vorba-buna restart
+    service fetch-radio-romania-actualitati-podcasts enable
+    service fetch-radio-romania-actualitati-podcasts restart
     service gohttpserver enable
     service gohttpserver restart
   else

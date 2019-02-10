@@ -1,0 +1,14 @@
+[Unit]
+Description=fetch-radio-romania-actualitati-podcasts
+After=multi-user.target
+
+[Service]
+Restart=always
+RestartSec=3600
+Type=idle
+User=root
+ExecStart=/usr/local/bin/fetch-radio-romania-actualitati-podcasts
+
+[Install]
+WantedBy=multi-user.target
+Alias=fetch-radio-romania-actualitati-podcasts.service

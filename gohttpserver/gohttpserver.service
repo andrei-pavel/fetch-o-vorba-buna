@@ -7,8 +7,8 @@ Restart=always
 RestartSec=60
 Type=idle
 User=root
-ExecStart=/usr/local/bin/gohttpserver --conf=/etc/fetch-o-vorba-buna/gohttpserver/config.yaml
-WorkingDirectory=/etc/fetch-o-vorba-buna/gohttpserver
+ExecStart=/usr/local/bin/gohttpserver --conf=/etc/fetch-radio-romania-actualitati-podcasts/gohttpserver/config.yaml
+WorkingDirectory=/etc/fetch-radio-romania-actualitati-podcasts/gohttpserver
 
 [Install]
 WantedBy=multi-user.target
