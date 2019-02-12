@@ -12,7 +12,7 @@ It has two modes:
 ./fetch-radio-romania-actualitati-podcasts -d|--download
 ```
 
-If used as service, it repeats every one hour.
+If used as service, it repeats every one hour, thus achieving continuous retrieval of episodes.
 
 Run `./install` to install as a service, it usually requires root access.
 
