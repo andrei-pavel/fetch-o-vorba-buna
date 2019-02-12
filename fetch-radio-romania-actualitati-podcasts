@@ -81,7 +81,11 @@ function fetch() {
     if [[ -f "${directory}/${filename}" ]]; then
       continue
     fi
-    download
+    if ${download}; then
+      download
+    else
+      redirect_html
+    fi
     i=$(( i - 1 ))
     stop-spinner 0
   done
