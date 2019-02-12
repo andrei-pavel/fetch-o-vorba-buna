@@ -50,7 +50,7 @@ function redirect_html() {
 }
 
 function filename() {
-  if $[download}; then
+  if ${download}; then
     filename="$(printf '%s' "${editions[${i}]}" | xargs).mp3"
   else
     filename="$(printf '%s' "${editions[${i}]}" | xargs)"
