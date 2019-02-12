@@ -5,7 +5,7 @@
 
 # Header
 ARGUMENTS="\
-\$mp3_index                    index of the mp3 audio files to start retrieving from
+  [-d|--download]               download audio files instead of creating HTML redirects to romania-actualitati.ro's storage
 "
 SCRIPT_PATH="$(dirname "$(readlink -f "${0}")")"
 . "${SCRIPT_PATH}/lib/header"
@@ -14,30 +14,39 @@ SCRIPT_PATH="$(dirname "$(readlink -f "${0}")")"
 # Parse arguments.
 while (( ${#} > 0 )); do
   case "${1}" in
-  *)
-    # \$mp3_index                    index of the mp3 audio files to start retrieving from
-    [[ -z "${mp3_index+x}" ]] && mp3_index=${1} && shift && continue
-    # Unrecognized argument
-    printf "${RED}ERROR: Unrecognized argument '%s'${RESET}\\n" "${1}" 1>&2; print-usage; exit 1 ;;
+  '-d' | '--download') download=true ;;
+  # Unrecognized argument
+  *) printf "${RED}ERROR: Unrecognized argument '%s'${RESET}\\n" "${1}" 1>&2; print-usage; exit 1 ;;
   esac; shift
 done
 
+# Default values
+[[ -z "${download+x}" ]] && download=false
+
 #------------------------------------------------------------------------------#
 
+function archive() {
+  month="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 4)"
+  year="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 5)"
+  month_directory="${directory}/${year}/${month}"
+  mkdir -p "${month_directory}"
+  cp -p "${auxiliary}" "${month_directory}/${filename}"
+  cp -p "${auxiliary}" "${directory}/${filename}"
+}
+
 function download() {
-  filename="$(printf '%s' "${editions[${i}]}" | xargs).mp3"
-  spared_files+="-not -name \"${filename}\" "
-  if [[ -f "${directory}/${filename}" ]]; then
-    return
-  fi
   if wget -O "${auxiliary}" "${urls[${i}]}" &> /dev/null; then
-    month="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 4)"
-    year="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 5)"
-    month_directory="${directory}/${year}/${month}"
-    mkdir -p "${month_directory}"
-    cp -p "${auxiliary}" "${month_directory}/${filename}"
-    cp -p "${auxiliary}" "${directory}/${filename}"
+    archive
+  else 
+    printf 'Could not download audio file %s' "${urls[${i}]}" >&2
   fi
+}
+
+function redirect_html() {
+  printf "\
+<html><head><meta http-equiv=\"refresh\" content=\"0;url=%s\" /><title>Redirecting...</title></head><body>Redirecting.... Click <a href=\"%s\">here</a> to hurry things up.</body></html>
+" "${urls[${i}]}" "${urls[${i}]}" > "${auxiliary}"
+  archive
 }
 
 function fetch() {
@@ -67,6 +76,11 @@ function fetch() {
   i=$(( ${#urls[@]} - 1 ))
   while (( i >= 0 )); do
     start-spinner "${name} - ${editions[${i}]}"
+    filename="$(printf '%s' "${editions[${i}]}" | xargs).mp3"
+    spared_files+="-not -name \"${filename}\" "
+    if [[ -f "${directory}/${filename}" ]]; then
+      continue
+    fi
     download
     i=$(( i - 1 ))
     stop-spinner 0
