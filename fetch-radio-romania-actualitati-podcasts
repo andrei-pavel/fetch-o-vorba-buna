@@ -94,10 +94,9 @@ function fetch() {
     start-spinner "${name} - ${editions[${i}]}"
     filename
     spared_files+="-not -name \"${filename}\" "
-    if [[ -f "${directory}/${filename}" ]]; then
-      continue
+    if [[ ! -f "${directory}/${filename}" ]]; then
+      retrieve
     fi
-    retrieve
     i=$(( i - 1 ))
     stop-spinner 0
   done
