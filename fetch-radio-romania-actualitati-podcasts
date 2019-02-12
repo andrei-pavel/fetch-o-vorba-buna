@@ -97,7 +97,7 @@ function fetch() {
     if [[ -f "${directory}/${filename}" ]]; then
       continue
     fi
-    fetch
+    retrieve
     i=$(( i - 1 ))
     stop-spinner 0
   done
