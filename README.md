@@ -2,6 +2,16 @@
 
 Get the latest 10 episodes of every show from Radio România Actualități.
 
+It has two modes:
+- one which creates HTML redirects:
+```
+./fetch-radio-romania-actualitati-podcasts
+```
+- one which downloads the actual audio file:
+```
+./fetch-radio-romania-actualitati-podcasts -d|--download
+```
+
 If used as service, it repeats every one hour.
 
 Run `./install` to install as a service, it usually requires root access.
