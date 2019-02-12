@@ -1,6 +1,6 @@
 # fetch-radio-romania-actualitati-podcasts
 
-Get the latest 10 episodes of everu show from Radio România Actualități.
+Get the latest 10 episodes of every show from Radio România Actualități.
 
 If used as service, it repeats every one hour.
 
