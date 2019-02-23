@@ -25,7 +25,7 @@ Version 1.0
 
 Install them yourself:
 - [curl](https://curl.haxx.se) - retrieve data from servers
-- [gohttpserver](https://github.com/codeskyblue/gohttpserver) - serves the data on the web
+- [caddy](https://github.com/mholt/caddy) - serves the data on the web
 - [pup](https://github.com/ericchiang/pup) - HTML parser
 - [wget](https://www.gnu.org/software/wget) - retrieve data from web servers
 

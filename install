@@ -26,39 +26,39 @@ done
 
 pushd "${SCRIPT_PATH}" > /dev/null
 {
-  for dependency in curl gohttpserver pup wget; do
+  for dependency in caddy curl pup wget; do
     if ! command -v ${dependency} &> /dev/null; then
       printf 'Please install %s before continuing.\n' "${dependency}" >&2
       exit 1
     fi
   done
 
-  mkdir -p '/etc/fetch-radio-romania-actualitati-podcasts/gohttpserver'
+  mkdir -p '/etc/fetch-radio-romania-actualitati-podcasts'
   mkdir -p '/lib/systemd/system'
   mkdir -p '/usr/share/html'
   mkdir -p '/usr/share/radio-romania-actualitati-podcasts'
 
   install './fetch-radio-romania-actualitati-podcasts' "${pkgdir}/usr/local/bin"
   install './fetch-radio-romania-actualitati-podcasts.service' "${pkgdir}/lib/systemd/system"
-  install './gohttpserver/gohttpserver.service' "${pkgdir}/lib/systemd/system"
+  install './caddy.service' "${pkgdir}/lib/systemd/system"
   if [[ ! -e '/usr/share/html/radio-romania-actualitati-podcasts' ]]; then
     ln -s '/usr/share/radio-romania-actualitati-podcasts' '/usr/share/html/radio-romania-actualitati-podcasts'
   fi
   install -d './lib' "${pkgdir}/usr/local/bin/lib"
-  cp -rf ./gohttpserver/* '/etc/fetch-radio-romania-actualitati-podcasts/gohttpserver'
+  cp -rf './Caddyfile' '/etc/fetch-radio-romania-actualitati-podcasts'
   install ./lib/* "${pkgdir}/usr/local/bin/lib"
 
   if command -v systemctl &> /dev/null; then
     systemctl daemon-reload
     systemctl enable fetch-radio-romania-actualitati-podcasts
     systemctl restart fetch-radio-romania-actualitati-podcasts
-    systemctl enable gohttpserver
-    systemctl restart gohttpserver
+    systemctl enable caddy
+    systemctl restart caddy
   elif command -v service &> /dev/null; then
     service fetch-radio-romania-actualitati-podcasts enable
     service fetch-radio-romania-actualitati-podcasts restart
-    service gohttpserver enable
-    service gohttpserver restart
+    service caddy enable
+    service caddy restart
   else
     printf 'Service not installed because neither systemd nor SysV-Init is not installed.' &> 2
   fi
