@@ -1,5 +1,10 @@
 radio-romania-actualitati.ro
 
+redir 301 {
+    if {>X-Forwarded-Proto} is http
+    / https://{host}{uri}
+}
+
 root /usr/share/radio-romania-actualitati-podcasts
 
 browse
