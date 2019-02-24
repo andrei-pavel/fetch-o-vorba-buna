@@ -33,6 +33,7 @@ pushd "${SCRIPT_PATH}" > /dev/null
     fi
   done
 
+  mkdir -p '/etc/caddy'
   mkdir -p '/etc/fetch-radio-romania-actualitati-podcasts'
   mkdir -p '/lib/systemd/system'
   mkdir -p '/usr/share/html'
@@ -45,7 +46,10 @@ pushd "${SCRIPT_PATH}" > /dev/null
     ln -s '/usr/share/radio-romania-actualitati-podcasts' '/usr/share/html/radio-romania-actualitati-podcasts'
   fi
   install -d './lib' "${pkgdir}/usr/local/bin/lib"
-  cp -rf './Caddyfile' '/etc/fetch-radio-romania-actualitati-podcasts'
+  if [[ ! -e '/etc/caddy/Caddyfile' ]]; then
+    cp -rf './Caddyfile' '/etc/caddy/Caddyfile'
+  fi
+  cp -rf './podcasts-Caddyfile' '/etc/fetch-radio-romania-actualitati-podcasts/Caddyfile'
   install ./lib/* "${pkgdir}/usr/local/bin/lib"
 
   if command -v systemctl &> /dev/null; then

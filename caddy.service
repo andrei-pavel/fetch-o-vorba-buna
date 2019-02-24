@@ -8,7 +8,7 @@ RestartSec=60
 Type=idle
 User=root
 ExecStart=/usr/bin/caddy -port 80
-WorkingDirectory=/etc/fetch-radio-romania-actualitati-podcasts
+WorkingDirectory=/etc/caddy
 
 [Install]
 WantedBy=multi-user.target
