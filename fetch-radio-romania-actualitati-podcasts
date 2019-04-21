@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Copyright (C) 2017-2018 Andrei Pavel, andrei.pavel@cti.pub.ro
+# Copyright (C) 2017-2019 Andrei Pavel, andrei.pavel@cti.pub.ro
 # Licensed under the MIT License
 
 # Header
 ARGUMENTS="\
-  [-d|--download]               download audio files instead of creating HTML redirects to romania-actualitati.ro's storage
+  [-a|--audio]                 download audio files instead of creating HTML redirects to romania-actualitati.ro's storage
 "
 SCRIPT_PATH="$(dirname "$(readlink -f "${0}")")"
 . "${SCRIPT_PATH}/lib/header"
@@ -14,14 +14,14 @@ SCRIPT_PATH="$(dirname "$(readlink -f "${0}")")"
 # Parse arguments.
 while (( ${#} > 0 )); do
   case "${1}" in
-  '-d' | '--download') download=true ;;
+  '-a' | '--audio') audio=true ;;
   # Unrecognized argument
   *) printf "${RED}ERROR: Unrecognized argument '%s'${RESET}\\n" "${1}" 1>&2; print-usage; exit 1 ;;
   esac; shift
 done
 
 # Default values
-[[ -z "${download+x}" ]] && download=false
+[[ -z "${audio+x}" ]] && audio=false
 
 #------------------------------------------------------------------------------#
 
@@ -50,7 +50,7 @@ function redirect_html() {
 }
 
 function filename() {
-  if ${download}; then
+  if ${audio}; then
     filename="$(printf '%s' "${editions[${i}]}" | xargs).mp3"
   else
     filename="$(printf '%s' "${editions[${i}]}" | xargs)"
@@ -58,7 +58,7 @@ function filename() {
 }
 
 function retrieve() {
-  if ${download}; then
+  if ${audio}; then
     download
   else
     redirect_html
