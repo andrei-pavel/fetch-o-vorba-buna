@@ -7,7 +7,8 @@ Restart=always
 RestartSec=60
 Type=idle
 User=root
-ExecStart=/usr/bin/caddy -port 80
+ExecStartPre=/usr/bin/ulimit -n 8192
+ExecStart=/usr/bin/caddy -log stdout
 WorkingDirectory=/etc/caddy
 
 [Install]
