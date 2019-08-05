@@ -1,14 +1,14 @@
 [Unit]
-Description=caddy
 After=multi-user.target
+Description=caddy
 
 [Service]
+ExecStart=/usr/bin/caddy -agree=true -log=stdout
+LimitNOFILE=8192
 Restart=always
 RestartSec=60
 Type=idle
 User=root
-ExecStartPre=/usr/bin/ulimit -n 8192
-ExecStart=/usr/bin/caddy -log stdout
 WorkingDirectory=/etc/caddy
 
 [Install]
