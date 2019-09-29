@@ -26,10 +26,11 @@ done
 
 pushd "${SCRIPT_PATH}" > /dev/null
 {
-  diff './fetch-radio-romania-actualitati-podcasts' "${pkgdir}/usr/local/bin"
-  diff './fetch-radio-romania-actualitati-podcasts.service' "${pkgdir}/lib/systemd/system"
-  diff './caddy.service' "${pkgdir}/lib/systemd/system"
-  diff './Caddyfile' '/etc/caddy/Caddyfile'
-  diff './podcasts-Caddyfile' '/etc/fetch-radio-romania-actualitati-podcasts/Caddyfile'
+  diff './fetch-radio-romania-actualitati-podcasts' "${pkgdir}/usr/local/bin/fetch-radio-romania-actualitati"
+  diff './share/Caddyfile' '/etc/caddy/Caddyfile'
+  diff './share/caddy.service' "${pkgdir}/lib/systemd/system/caddy.service"
+  diff './share/fetch-radio-romania-actualitati-podcasts.service' "${pkgdir}/lib/systemd/system/fetch-radio-romania-actualitati-podcasts.service"
+  diff './share/podcasts-Caddyfile' '/etc/fetch-radio-romania-actualitati-podcasts/Caddyfile'
+  diff './share/privacy-policy.html' '/usr/share/radio-romania-actualitati-podcasts/privacy-policy.html'
 }
 popd 1> /dev/null
