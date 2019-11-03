@@ -26,7 +26,7 @@ done
 
 pushd "${SCRIPT_PATH}" > /dev/null
 {
-  diff './fetch-radio-romania-actualitati-podcasts' "${pkgdir}/usr/local/bin/fetch-radio-romania-actualitati"
+  diff './fetch-radio-romania-actualitati-podcasts' "${pkgdir}/usr/local/bin/fetch-radio-romania-actualitati-podcasts"
   diff './share/Caddyfile' '/etc/caddy/Caddyfile'
   diff './share/caddy.service' "${pkgdir}/lib/systemd/system/caddy.service"
   diff './share/fetch-radio-romania-actualitati-podcasts.service' "${pkgdir}/lib/systemd/system/fetch-radio-romania-actualitati-podcasts.service"
