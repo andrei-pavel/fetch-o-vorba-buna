@@ -107,6 +107,7 @@ function fetch() {
 }
 
 list=(
+  'vatra_luminoasa/36'
   'un_minut_de_sanatate/20'
   'teatru_national_radiofonic/29'
   'sitcom_undeva_in_28/33'
@@ -116,14 +117,18 @@ list=(
   'printre_stele/26'
   'povesti_cu_care_cresti/17'
   'o_vorba_buna/14'
+  'multi_kulti/37'
+  'minutul_de_limba_romana/38'
   'lumina_credintei/35'
   'lectia_de_gramatica/13'
   'la_dispozitia_dumneavoastra_reteta_de_sanatate/18'
+  'la_dispozitia_dumneavoastra/39'
   'istorica/4'
   'euroatlantica/8'
   'de_la_la_infinit/34'
   'documentarele_radio_romania_actualitati/5'
   'colectia_de_muzica_omul_cu_chitara/27'
+  'coronavirus_la_obiectiv_romania/40'
   'buna_ziua_caciula_ca_stapanul_n_are_guracod_de_bune_maniere/15'
   'antena_partidelor_parlamentare/30'
   'agenda_globala/1'
