@@ -9,7 +9,7 @@ It has two modes:
 ```
 - one which downloads the actual audio file:
 ```
-./fetch-radio-romania-actualitati-podcasts -d|--download
+./fetch-radio-romania-actualitati-podcasts -a|--audio
 ```
 
 If used as service, it repeats every one hour, thus achieving continuous retrieval of episodes.
