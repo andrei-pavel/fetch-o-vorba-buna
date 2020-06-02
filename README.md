@@ -28,8 +28,3 @@ Install them yourself:
 - [caddy](https://github.com/mholt/caddy) - serves the data on the web
 - [pup](https://github.com/ericchiang/pup) - HTML parser
 - [wget](https://www.gnu.org/software/wget) - retrieve data from web servers
-
-
-## Support the maintainer
-
-<noscript><a href="https://liberapay.com/andrei/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a></noscript>
