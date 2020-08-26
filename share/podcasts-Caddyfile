@@ -1,12 +1,11 @@
-radio-romania-actualitati.ro {
-    browse
+http://radio-romania-actualitati.ro {
+  redir https://{host}{uri}
+}
 
-    redir 301 {
-        if {>X-Forwarded-Proto} is http
-        / https://{host}{uri}
-    }
+https://radio-romania-actualitati.ro {
+    file_server browse
 
-    root /usr/share/radio-romania-actualitati-podcasts
+    root * /usr/share/radio-romania-actualitati-podcasts
 
-    tls {}
+    tls /etc/letsencrypt/live/radio-romania-actualitati.ro/cert.pem /etc/letsencrypt/live/radio-romania-actualitati.ro/privkey.pem
 }

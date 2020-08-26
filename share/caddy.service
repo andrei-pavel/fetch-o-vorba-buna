@@ -3,7 +3,7 @@ After=multi-user.target
 Description=caddy
 
 [Service]
-ExecStart=/usr/bin/caddy -agree=true -log=stdout
+ExecStart=/usr/bin/caddy run
 LimitNOFILE=8192
 Restart=always
 RestartSec=60
