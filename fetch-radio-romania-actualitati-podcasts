@@ -42,10 +42,9 @@ function redirect_html() {
 }
 
 function filename() {
+  filename="$(printf '%s' "${editions[${i}]}" | tr -s ' ' | xargs)"
   if ${audio}; then
-    filename="$(printf '%s' "${editions[${i}]}" | xargs).mp3"
-  else
-    filename="$(printf '%s' "${editions[${i}]}" | xargs)"
+    filename="${filename}.mp3"
   fi
 }
 
@@ -58,11 +57,11 @@ function retrieve() {
 }
 
 function fetch() {
-  local name="${1}"
+  local podcast="${1}"
   local url="${2}"
 
-  directory="/usr/share/radio-romania-actualitati-podcasts/${name}"
-  auxiliary="/tmp/${name}.mp3"
+  directory="/usr/share/radio-romania-actualitati-podcasts/${podcast}"
+  auxiliary="/tmp/${podcast}.mp3"
 
   if [[ ! -e "${directory}" ]]; then
     mkdir -p "${directory}"
@@ -83,8 +82,8 @@ function fetch() {
   spared_files=
   i=$(( ${#urls[@]} - 1 ))
   while (( i >= 0 )); do
-    start-spinner "${name} - ${editions[${i}]}"
     filename
+    start-spinner "${podcast} - ${filename}"
     spared_files+="-not -name \"${filename}\" "
     if [[ ! -f "${directory}/${filename}" ]]; then
       retrieve
