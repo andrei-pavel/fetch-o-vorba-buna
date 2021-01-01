@@ -25,10 +25,10 @@ ${ARGUMENTS}"
   printf \
 'Usage: %s {{options}} %s
 Options:
-  [-c|--config $config_yaml]                                   Read from a YAML configuration and convert all
-                                                               key-value pairs to environment variables.
-  [-d|--debug]                                                 Enable debug mode, showing every executed command.
-  [-h|--help]                                                  Print usage (this text).%s%s' \
+  [-c|--config $config_yaml]                                    Read from a YAML configuration and convert all
+                                                                key-value pairs to environment variables.
+  [-d|--debug]                                                  Enable debug mode, showing every executed command.
+  [-h|--help]                                                   Print usage (this text).%s%s' \
     "$(basename "${0}")" "${arguments}" "${ARGUMENTS}" "${_add_to_usage-}"
 }
 
@@ -62,6 +62,16 @@ else
   WHITE=
 fi
 
+# Reset variables responsible for argument defining & parameter parsing.
+export _simple_argument_variables=''
+export _simple_argument_parameters=''
+export _simple_argument_descriptions=''
+export _valued_argument_variables=''
+export _valued_argument_parameters=''
+export _valued_argument_descriptions=''
+export _positional_argument_variables=''
+export _positional_argument_descriptions=''
+
 # Parse arguments.
 # Source guard
 test -n "${_LIB_HEADER_SOURCED+x}" && return 0
@@ -88,28 +98,32 @@ function argument() {
   local parameter_or_description=${3}
   local description=${4-}
   local length
+  local first_column
   case "${mode}" in
     'simple')
       printf -v _simple_argument_variables '%s%s\n' "${_simple_argument_variables}" "${variable}"
       printf -v _simple_argument_parameters '%s%s\n' "${_simple_argument_parameters}" "@(${parameter_or_description})"
       printf -v _simple_argument_descriptions '%s%s\n' "${_simple_argument_descriptions}" "${description}"
-      length=$(( ${#description} + 58 - ${#parameter_or_description} )) # 58 = 64 - 5 - 1
-      printf -v ARGUMENTS "%s  [%s] %${length}s\\n" "${ARGUMENTS-}" "${parameter_or_description}" "${description}"
+      first_column=$(printf '  [%s] ' "${parameter_or_description}")
+      length=$(( ${#description} + 64 - ${#first_column} ))
+      printf -v ARGUMENTS "%s%s%${length}s\\n" "${ARGUMENTS-}" "${first_column}" "${description}"
       unset "${variable}"
       ;;
     'valued')
       printf -v _valued_argument_variables '%s%s\n' "${_valued_argument_variables}" "${variable}"
       printf -v _valued_argument_parameters '%s%s\n' "${_valued_argument_parameters}" "@(${parameter_or_description})"
       printf -v _valued_argument_descriptions '%s%s\n' "${_valued_argument_descriptions}" "${description}"
-      length=$(( ${#description} + 56 - ${#parameter_or_description} - ${#variable} )) # 59 = 64 - 4 - 1
-      printf -v ARGUMENTS "%s  [%s %s] %${length}s\\n" "${ARGUMENTS-}" "${parameter_or_description}" "\$${variable}" "${description}"
+      first_column=$(printf '  [%s %s] ' "${parameter_or_description}" "\$${variable}" )
+      length=$(( ${#description} + 64 - ${#first_column} ))
+      printf -v ARGUMENTS "%s%s%${length}s\\n" "${ARGUMENTS-}" "${first_column}" "${description}"
       unset "${variable}"
       ;;
     'positional')
       printf -v _positional_argument_variables '%s%s\n' "${_positional_argument_variables}" "${variable}"
       printf -v _positional_argument_descriptions '%s%s\n' "${_positional_argument_descriptions}" "${parameter_or_description}"
-      length=$(( ${#parameter_or_description} + 58 - ${#variable} )) # 58 = 64 - 5 - 1
-      printf -v ARGUMENTS "%s  [%s] %${length}s\\n" "${ARGUMENTS-}" "${variable}" "${parameter_or_description}"
+      first_column=$(printf '  [%s] ' "${variable}")
+      length=$(( ${#parameter_or_description} + 64 - ${#first_column} ))
+      printf -v ARGUMENTS "%s%s%${length}s\\n" "${ARGUMENTS-}" "${first_column}" "${parameter_or_description}"
       unset "${variable}"
       ;;
     *)
@@ -257,16 +271,6 @@ export -f allow-extra-parameters
 export -f argument
 export -f parse-parameters
 export -f print-usage
-
-# Export variables responsible for argument defining & parameter parsing.
-test -z "${_simple_argument_variables+x}" && export _simple_argument_variables=''
-test -z "${_simple_argument_parameters+x}" && export _simple_argument_parameters=''
-test -z "${_simple_argument_descriptions+x}" && export _simple_argument_descriptions=''
-test -z "${_valued_argument_variables+x}" && export _valued_argument_variables=''
-test -z "${_valued_argument_parameters+x}" && export _valued_argument_parameters=''
-test -z "${_valued_argument_descriptions+x}" && export _valued_argument_descriptions=''
-test -z "${_positional_argument_variables+x}" && export _positional_argument_variables=''
-test -z "${_positional_argument_descriptions+x}" && export _positional_argument_descriptions=''
 
 # Export paths.
 export LIB_PATH
