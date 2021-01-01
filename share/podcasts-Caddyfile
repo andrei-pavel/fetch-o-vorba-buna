@@ -1,11 +1,11 @@
-http://radio-romania-actualitati.ro {
+http://radio-romania.ddns.net {
   redir https://{host}{uri}
 }
 
-https://radio-romania-actualitati.ro {
+https://radio-romania.ddns.net {
     file_server browse
 
     root * /usr/share/radio-romania-actualitati-podcasts
 
-    tls /etc/letsencrypt/live/radio-romania-actualitati.ro/cert.pem /etc/letsencrypt/live/radio-romania-actualitati.ro/privkey.pem
+    tls /etc/letsencrypt/live/radio-romania.ddns.net/cert.pem /etc/letsencrypt/live/radio-romania.ddns.net/privkey.pem
 }
