@@ -5,7 +5,7 @@ http://radio-romania.ddns.net {
 https://radio-romania.ddns.net {
     file_server browse
 
-    root * /usr/share/radio-romania-actualitati-podcasts
+    root * /usr/share/rra-podcasts
 
     tls /etc/letsencrypt/live/radio-romania.ddns.net/cert.pem /etc/letsencrypt/live/radio-romania.ddns.net/privkey.pem
 }

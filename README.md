@@ -16,7 +16,7 @@ If used as service, it repeats every one hour, thus achieving continuous retriev
 
 Run `./install` to install as a service, it usually requires root access.
 
-Episodes will be found in `/usr/share/radio-romania-actualitati-podcasts/${show}`.
+Episodes will be found in `/usr/share/rra-podcasts/${show}`.
 
 Version 1.0
 

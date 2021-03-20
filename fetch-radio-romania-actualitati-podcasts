@@ -18,124 +18,109 @@ test -z "${audio+x}" && audio=false
 #------------------------------------------------------------------------------#
 
 function archive() {
-  month="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 4)"
-  year="$(printf '%s' "${editions[${i}]}" | xargs | cut -d ' ' -f 5)"
-  month_directory="${directory}/${year}/${month}"
+  local auxiliary="${1}"
+  local directory="${2}"
+  local filename="${3}"
+  local month="${4}"
+  local year="${5}"
+  local month_directory="${directory}/${year}/${month}"
   mkdir -p "${month_directory}"
   cp -p "${auxiliary}" "${month_directory}/${filename}"
   cp -p "${auxiliary}" "${directory}/${filename}"
 }
 
 function download() {
-  if wget -O "${auxiliary}" "${urls[${i}]}" &> /dev/null; then
-    archive
-  else
-    printf 'Could not download audio file %s' "${urls[${i}]}" >&2
+  local target="${1}"
+  local url="${2}"
+  if ! wget -O "${target}" "${url}" &> /dev/null; then
+    printf 'Could not download audio file %s' "${url}" >&2
   fi
 }
 
-function redirect_html() {
+function redirect-html() {
+  local target="${1}"
+  local url="${2}"
   printf "\
 <html><head><meta http-equiv=\"refresh\" content=\"0;url=%s\" /><title>Redirecting...</title></head><body>Redirecting.... Click <a href=\"%s\">here</a> to hurry things up.</body></html>
-" "${urls[${i}]}" "${urls[${i}]}" > "${auxiliary}"
-  archive
+" "${url}" "${url}" > "${target}"
 }
 
-function filename() {
-  filename="$(printf '%s' "${editions[${i}]}" | tr -s ' ' | xargs)"
-  if ${audio}; then
-    filename="${filename}.mp3"
+function spare-file() {
+  local filename="${1}"
+  if test -z "${spared_files+x}"; then
+    spared_files=
   fi
+  spared_files+="-not -name \"${filename}\" "
 }
 
-function retrieve() {
-  if ${audio}; then
-    download
-  else
-    redirect_html
-  fi
+function cleanup() {
+  local directory="${1}"
+  eval find "${directory}" -maxdepth 1 -type f ${spared_files} -delete
+  spared_files=
 }
 
 function fetch() {
   local podcast="${1}"
-  local url="${2}"
+  local episode="${2}"
+  local url="${3}"
+  local directory="${4}"
+  local auxiliary="/tmp/${podcast}.mp3"
 
-  directory="/usr/share/radio-romania-actualitati-podcasts/${podcast}"
-  auxiliary="/tmp/${podcast}.mp3"
-
-  if [[ ! -e "${directory}" ]]; then
-    mkdir -p "${directory}"
-  fi
-
-  editions=$(curl -s "http://www.romania-actualitati.ro/Podcast/${url}" | pup 'div.podcastilisting a text{}')
-  urls=$(curl -s "http://www.romania-actualitati.ro/Podcast/${url}" | pup 'div.podcastilisting a attr{href}' | grep -v '#')
-
-  SAVEIFS="${IFS}"
-  IFS=$'\n'
-
-  editions=( ${editions} )
-
-  urls=( ${urls} )
-
-  IFS="${SAVEIFS}"
-
+  mkdir -p "${directory}"
   spared_files=
-  i=$(( ${#urls[@]} - 1 ))
-  while (( i >= 0 )); do
-    filename
-    start-spinner "${podcast} - ${filename}"
-    spared_files+="-not -name \"${filename}\" "
-    if [[ ! -f "${directory}/${filename}" ]]; then
-      retrieve
-    fi
-    i=$(( i - 1 ))
-    stop-spinner 0
-  done
 
-  eval find "${directory}" -maxdepth 1 -type f ${spared_files} -delete
+  filename="${episode}"
+  if ${audio}; then
+    filename="${filename}.mp3"
+  fi
+  # start-spinner "${podcast} - ${filename}"
+  spare-file "${filename}"
+  if test ! -f "${directory}/${filename}"; then
+    if ${audio}; then
+      download "${auxiliary}" "${url}"
+    else
+      redirect-html "${auxiliary}" "${url}"
+    fi
+    local date="$(printf '%s' "${episode}" | sed 's/ /-/g' | cut -d ' ' -f 3)"
+    local month="$(printf '%s' "${date}" | cut -d '-' -f 4)"
+    local year="$(printf '%s' "${date}" | cut -d '-' -f 5)"
+    archive "${auxiliary}" "${directory}" "${filename}" "${month}" "${year}"
+  fi
+  stop-spinner ${?}
 
   rm -f "${auxiliary}"
 }
 
-function get_list_manually() {
-  list=(
-    vatra_luminoasa/36
-    un_minut_de_sanatate/20
-    teatru_national_radiofonic/29
-    sitcom_undeva_in_28/33
-    serviciul_de_noapte/25
-    semnele_lumii/21
-    probleme_la_zi/22
-    printre_stele/26
-    povesti_cu_care_cresti/17
-    o_vorba_buna/14
-    multi_kulti/37
-    minutul_de_limba_romana/38
-    lumina_credintei/35
-    lectia_de_gramatica/13
-    la_dispozitia_dumneavoastra_reteta_de_sanatate/18
-    la_dispozitia_dumneavoastra/39
-    istorica/4
-    euroatlantica/8
-    de_la_la_infinit/34
-    documentarele_radio_romania_actualitati/5
-    colectia_de_muzica_omul_cu_chitara/27
-    coronavirus_la_obiectiv_romania/40
-    buna_ziua_caciula_ca_stapanul_n_are_guracod_de_bune_maniere/15
-    antena_partidelor_parlamentare/30
-    agenda_globala/1
-    accente_europene/24
-    150_de_cuvinte/12
-  )
+function main() {
+  local link='https://podcast.srr.ro/'
+  local radio_list=( $( curl -Ls "${link}" | pup 'div#top-menu-2 a attr{href}' ) )
+  for i in ${radio_list}; do
+    local podcast_list=$(curl -Ls "${link}${i}" | pup 'div#top-menu-3 a attr{href}')
+    local podcast_title_list=$(curl -Ls "${link}${i}" | pup 'div#top-menu-3 a text{}')
+    local jj=1
+    for j in ${podcast_list}; do
+      local podcast=$(printf '%s\n' "${podcast_title_list}" | head -n "${jj}" | tail -n 1 | xargs)
+      podcast="${podcast,,}"
+      podcast=$(printf '%s\n' "${podcast}" | sed 's/ /-/g')
+      local directory="/usr/share/rra-podcasts/${podcast}"
+      local episode_htmls=$(curl -Ls "${link}${i}${j}" | pup 'div.card')
+      local episode_titles=$(printf '%s\n' "${episode_htmls}" | pup 'div.card-body p.card-text text{}' | sed '/^ *$/d')
+      local episode_links=$(printf '%s\n' "${episode_htmls}" | pup 'div.card-footer audio source attr{src}')
+      k=1
+      while true; do
+        local episode=$(printf '%s\n\n' "${episode_titles}" | head -n "${k}" | tail -n 1 | xargs)
+        local url=$(printf '%s\n\n' "${episode_links}" | head -n "${k}" | tail -n 1)
+        if test -z "${episode}" && test -z "${url}"; then
+          break
+        fi
+        url="${link}${url}"
+        fetch "${podcast}" "${episode}" "${url}" "${directory}"
+        k=$((k + 1))
+      done
+      jj=$((jj + 1))
+      cleanup "${directory}"
+    done
+  done
 }
 
-function get_list_automatically() {
-  list=( $(curl -s "http://www.romania-actualitati.ro/Podcast" | pup 'div.podcastiTEM h2 a attr{href}' | sed 's#/Podcast/##g' | sort -ruV) )
-}
-
-get_list_automatically
-for item in ${list[@]}; do
-  name="$(cut -d '/' -f 1 <<< ${item})"
-  name="${name//_/-}"
-  fetch ${name} ${item}
-done
+main
