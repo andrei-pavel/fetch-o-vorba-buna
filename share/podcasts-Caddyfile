@@ -7,5 +7,5 @@ https://radio-romania.ddns.net {
 
     root * /usr/share/rra-podcasts
 
-    tls /etc/letsencrypt/live/radio-romania.ddns.net/cert.pem /etc/letsencrypt/live/radio-romania.ddns.net/privkey.pem
+    tls andrei.pavel@mail.com
 }

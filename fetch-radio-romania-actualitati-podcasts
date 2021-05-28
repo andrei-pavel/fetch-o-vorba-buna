@@ -45,18 +45,52 @@ function redirect-html() {
 " "${url}" "${url}" > "${target}"
 }
 
-function spare-file() {
-  local filename="${1}"
-  if test -z "${spared_files+x}"; then
-    spared_files=
-  fi
-  spared_files+="-not -name \"${filename}\" "
-}
-
 function cleanup() {
   local directory="${1}"
-  eval find "${directory}" -maxdepth 1 -type f ${spared_files} -delete
-  spared_files=
+  while true; do
+    file=$(find "${directory}" -maxdepth 1 -type f -printf '%T@\t%p\n' | sort -t $'\t' -g | head -n -10 | cut -d $'\t' -f 2- | tail -n 1)
+    if test -n "${file}"; then
+      rm "${file}"
+    else
+      break
+    fi
+  done
+}
+
+function literal-months-to-numeric-months() {
+  result=
+  while test ${#} -gt 0; do
+    m=$(printf '%s' "${1}" | tr '[:upper:]' '[:lower:]')
+    if test "${m}" = 'ianuarie'; then
+      result="${result} 01"
+    elif test "${m}" = 'februarie'; then
+      result="${result} 02"
+    elif test "${m}" = 'martie'; then
+      result="${result} 03"
+    elif test "${m}" = 'aprilie'; then
+      result="${result} 04"
+    elif test "${m}" = 'mai'; then
+      result="${result} 05"
+    elif test "${m}" = 'iunie'; then
+      result="${result} 06"
+    elif test "${m}" = 'iulie'; then
+      result="${result} 07"
+    elif test "${m}" = 'august'; then
+      result="${result} 08"
+    elif test "${m}" = 'septembrie'; then
+      result="${result} 09"
+    elif test "${m}" = 'octombrie'; then
+      result="${result} 10"
+    elif test "${m}" = 'noiembrie'; then
+      result="${result} 11"
+    elif test "${m}" = 'decembrie'; then
+      result="${result} 12"
+    else
+      result="${result} ${m}"
+    fi
+    shift
+  done
+  printf '%s' "${result}" | sed 's/^ *//g' | sed 's/ *$//g';
 }
 
 function fetch() {
@@ -67,14 +101,11 @@ function fetch() {
   local auxiliary="/tmp/${podcast}.mp3"
 
   mkdir -p "${directory}"
-  spared_files=
 
   filename="${episode}"
   if ${audio}; then
     filename="${filename}.mp3"
   fi
-  # start-spinner "${podcast} - ${filename}"
-  spare-file "${filename}"
   if test ! -f "${directory}/${filename}"; then
     if ${audio}; then
       download "${auxiliary}" "${url}"
@@ -82,11 +113,13 @@ function fetch() {
       redirect-html "${auxiliary}" "${url}"
     fi
     local date="$(printf '%s' "${episode}" | sed 's/ /-/g' | cut -d ' ' -f 3)"
+    local day="$(printf '%s' "${date}" | cut -d '-' -f 3)"
     local month="$(printf '%s' "${date}" | cut -d '-' -f 4)"
     local year="$(printf '%s' "${date}" | cut -d '-' -f 5)"
+    month=$(literal-months-to-numeric-months "${month}")
+    touch -d "${year}-${month}-${day}" "${auxiliary}" || true
     archive "${auxiliary}" "${directory}" "${filename}" "${month}" "${year}"
   fi
-  stop-spinner ${?}
 
   rm -f "${auxiliary}"
 }
@@ -102,6 +135,10 @@ function main() {
       local podcast=$(printf '%s\n' "${podcast_title_list}" | head -n "${jj}" | tail -n 1 | xargs)
       podcast="${podcast,,}"
       podcast=$(printf '%s\n' "${podcast}" | sed 's/ /-/g')
+      podcast=$(printf '%s\n' "${podcast}" | sed 's/&#34;-&#34;/minus/g')
+      podcast=$(printf '%s\n' "${podcast}" | sed 's/&#34;+&#34;/plus/g')
+      podcast=$(printf '%s\n' "${podcast}" | sed 's/---/-/g')
+      start-spinner "${podcast}"
       local directory="/usr/share/rra-podcasts/${podcast}"
       local episode_htmls=$(curl -Ls "${link}${i}${j}" | pup 'div.card')
       local episode_titles=$(printf '%s\n' "${episode_htmls}" | pup 'div.card-body p.card-text text{}' | sed '/^ *$/d')
@@ -119,6 +156,7 @@ function main() {
       done
       jj=$((jj + 1))
       cleanup "${directory}"
+      stop-spinner ${?}
     done
   done
 }
